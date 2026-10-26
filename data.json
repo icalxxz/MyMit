@@ -1,0 +1,26 @@
+{
+  "sensors": {
+    "node_01": {
+      "masterAlert": {
+        "status": "BAHAYA",
+        "timestamp": "26 Okt 2026, 18:32 WIB"
+      },
+      "mpu6050": {
+        "gForce": 3.45,
+        "status": "Bahaya",
+        "xAxis": 2.15,
+        "yAxis": 1.80,
+        "zAxis": 1.95
+      },
+      "waterLevel": {
+        "height": 135,
+        "deltaRate": "+18.4",
+        "status": "Bahaya"
+      },
+      "deviceInfo": {
+        "deviceId": "ESP32-NODE-01",
+        "rssi": -75
+      }
+    }
+  }
+}
