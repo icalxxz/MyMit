@@ -29,6 +29,17 @@ npm run build
 
 Hasil build dibuat di folder `dist/`. Folder tersebut, `node_modules/`, dan `.env` sengaja tidak disertakan dalam Git.
 
+## Build aplikasi Android
+
+Prasyarat: Node.js 22 atau lebih baru, Android Studio, Android SDK, dan JDK 21.
+
+1. Instal dependency: `npm ci`.
+2. Buka folder proyek ini di Android Studio (atau jalankan `npm run cap:open`).
+3. Jalankan sinkronisasi web dan plugin: `npm run cap:sync`.
+4. Build APK debug melalui Android Studio, atau jalankan `npm run android:run` dengan perangkat/emulator terhubung.
+
+Setelah perubahan web, jalankan `npm run cap:sync` lagi sebelum membangun APK. Izin notifikasi diminta dari tombol **Aktifkan** dalam aplikasi; APK memakai notifikasi lokal Android, sedangkan versi web memakai browser Notification API. Notifikasi hanya dipicu ketika sensor beralih dari kondisi non-bahaya ke bahaya saat aplikasi berjalan.
+
 ## Deploy ke GitHub
 
 Inisialisasi Git telah disiapkan di direktori ini. Setelah membuat repository kosong di GitHub, jalankan (ganti URL-nya):

@@ -18,7 +18,9 @@ export default function SafetyStatusCard({ activeTone, permission, supported, on
     </div>
     <div className="notification-control">
       <div><strong>Notifikasi bahaya</strong><span>{notificationsEnabled ? 'Aktif di perangkat ini' : supported ? 'Izinkan agar peringatan terkirim' : 'Browser tidak mendukung notifikasi'}</span></div>
-      {supported && !notificationsEnabled && <button type="button" onClick={onEnableNotifications}>Aktifkan</button>}
+      {supported && !notificationsEnabled && permission !== 'denied' && <button type="button" onClick={onEnableNotifications}>Aktifkan</button>}
+      {supported && permission === 'denied' && <span>Izin ditolak. Ubah di pengaturan aplikasi.</span>}
+      {supported && permission === 'unavailable' && <span>Notifikasi belum tersedia.</span>}
       {notificationsEnabled && <span className="notification-enabled">Aktif</span>}
     </div>
   </article>;

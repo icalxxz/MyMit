@@ -1,0 +1,30 @@
+{
+  "masterAlert": {
+    "status": "AMAN",
+    "timestamp": "07 Nov 2026, 12:30 WIB"
+  },
+  "mpu6050": {
+    "gForce": 1.02,
+    "warningThreshold": 1.5,
+    "status": "Normal",
+    "xAxis": 0.02,
+    "yAxis": 0.01,
+    "zAxis": 0.98
+  },
+  "waterLevel": {
+    "height": 40,
+    "jsnHeight": 42,
+    "deltaRate": "+0.1",
+    "status": "Normal"
+  },
+  "rain": {
+    "detected": false,
+    "rate": 0.0,
+    "unit": "mm/jam",
+    "status": "Cerah"
+  },
+  "deviceInfo": {
+    "deviceId": "ESP32-NODE-01",
+    "rssi": -68
+  }
+}

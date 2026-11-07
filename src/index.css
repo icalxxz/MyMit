@@ -1,1 +1,6 @@
 @import "tailwindcss";
+
+html { min-height:100%; background:#e4e9ef; overscroll-behavior-y:none; -webkit-text-size-adjust:100%; }
+body { min-height:100vh; min-height:100dvh; overscroll-behavior-y:none; -webkit-tap-highlight-color:transparent; }
+button { touch-action:manipulation; }
+#root { min-height:100vh; min-height:100dvh; }
