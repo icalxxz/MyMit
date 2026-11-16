@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { get, onValue, ref } from 'firebase/database';
-import { rtdb } from '../firebase/firebase';
+import sensorJson from '../../data.json';
+import { hasFirebaseConfig, rtdb } from '../firebase/firebase';
 
 function nodeNumber(key) {
   const match = String(key).match(/^(?:node[_-]?)?(\d+)$/i);
@@ -24,27 +25,16 @@ function newestNode(nodes) {
     : { id: nodeId, data: nodeData };
 }
 
-function collectHistory(nodes, activeId) {
-  return Object.entries(nodes || {}).flatMap(([nodeId, nodeData]) => {
-    if (!nodeData || typeof nodeData !== 'object' || nodeNumber(nodeId) === null) return [];
-    const records = Object.entries(nodeData).filter(([key, value]) => /^data[_-]?\d+$/i.test(key) && value && typeof value === 'object');
-    const candidates = records.length ? records.map(([recordId, data]) => ({
-      id: `${nodeId}/${recordId}`, nodeId, recordId, data,
-      order: Number(recordId.match(/\d+/)?.[0]) || 0,
-    })) : [{ id: nodeId, nodeId, recordId: null, data: nodeData, order: 0 }];
-    return candidates.filter(record => record.id !== activeId);
-  }).sort((a, b) => nodeNumber(b.nodeId) - nodeNumber(a.nodeId) || b.order - a.order);
-}
-
 /** Mengikuti semua sensors di RTDB, lalu menampilkan node bernomor terbaru. */
 export function useSensorData() {
-  const [sensorData, setSensorData] = useState(null);
-  const [activeNodeId, setActiveNodeId] = useState(null);
-  const [history, setHistory] = useState([]);
-  const [connectionState, setConnectionState] = useState('connecting');
+  const localNode = newestNode(sensorJson);
+  const [sensorData, setSensorData] = useState(hasFirebaseConfig ? null : localNode?.data ?? null);
+  const [activeNodeId, setActiveNodeId] = useState(hasFirebaseConfig ? null : localNode?.id ?? null);
+  const [connectionState, setConnectionState] = useState(hasFirebaseConfig ? 'connecting' : 'local');
   const [lastSyncedAt, setLastSyncedAt] = useState(null);
 
   useEffect(() => {
+    if (!hasFirebaseConfig || !rtdb) return undefined;
     const sensorsRef = ref(rtdb, 'sensors');
     let active = true;
     let isConnected = false;
@@ -56,13 +46,11 @@ export function useSensorData() {
       if (!selected) {
         setSensorData(null);
         setActiveNodeId(null);
-        setHistory([]);
         setConnectionState('empty');
         return;
       }
       setSensorData(selected.data);
       setActiveNodeId(selected.id);
-      setHistory(collectHistory(snapshot.val(), selected.id));
       if (fromServer && isConnected) {
         setLastSyncedAt(new Date());
         setConnectionState('live');
@@ -98,5 +86,5 @@ export function useSensorData() {
     };
   }, []);
 
-  return { sensorData, activeNodeId, history, connectionState, lastSyncedAt };
+  return { sensorData, activeNodeId, connectionState, lastSyncedAt };
 }

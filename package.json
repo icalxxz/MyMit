@@ -7,6 +7,7 @@
     "dev": "vite",
     "build": "vite build",
     "cap:sync": "npm run build && node scripts/run-capacitor.cjs sync android",
+    "cap:build": "npm run cap:sync && node scripts/run-capacitor.cjs build android",
     "cap:open": "node scripts/run-capacitor.cjs open android",
     "android:run": "npm run cap:sync && node scripts/run-capacitor.cjs run android",
     "lint": "eslint .",
@@ -16,11 +17,11 @@
     "@capacitor/android": "^8.6.0",
     "@capacitor/core": "^8.6.0",
     "@capacitor/local-notifications": "^8.3.1",
-    "@tailwindcss/vite": "^4.3.3",
-    "firebase": "^13.1.0",
+    "@tailwindcss/vite": "^4.3.5",
+    "firebase": "^13.3.0",
     "react": "^19.3.1",
     "react-dom": "^19.3.1",
-    "tailwindcss": "^4.3.3"
+    "tailwindcss": "^4.3.5"
   },
   "devDependencies": {
     "@capacitor/cli": "^8.6.0",

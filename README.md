@@ -20,6 +20,8 @@ Prasyarat: Node.js 20 atau lebih baru dan npm.
    npm run dev
    ```
 
+Jika konfigurasi Firebase tidak tersedia, dashboard membaca `data.json` lokal. Jika variabel Firebase tersedia, aplikasi memakai Realtime Database pada path `sensors`.
+
 ## Pemeriksaan produksi
 
 ```powershell
@@ -39,6 +41,8 @@ Prasyarat: Node.js 22 atau lebih baru, Android Studio, Android SDK, dan JDK 21.
 4. Build APK debug melalui Android Studio, atau jalankan `npm run android:run` dengan perangkat/emulator terhubung.
 
 Setelah perubahan web, jalankan `npm run cap:sync` lagi sebelum membangun APK. Izin notifikasi diminta dari tombol **Aktifkan** dalam aplikasi; APK memakai notifikasi lokal Android, sedangkan versi web memakai browser Notification API. Notifikasi hanya dipicu ketika sensor beralih dari kondisi non-bahaya ke bahaya saat aplikasi berjalan.
+
+Perintah `npm run cap:build` menjalankan build web, sinkronisasi Capacitor, lalu memanggil build Android. Untuk APK debug, gunakan Android Studio atau `npm run android:run` dengan perangkat/emulator terhubung.
 
 ## Deploy ke GitHub
 

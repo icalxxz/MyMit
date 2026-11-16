@@ -1,158 +1,37 @@
 {
-  "sensors": {
-    "node_01": {
-      "masterAlert": {
-        "status": "BAHAYA",
-        "timestamp": "26 Okt 2026, 18:32 WIB"
-      },
-      "mpu6050": {
-        "gForce": 0.98,
-        "warningThreshold": 1.5,
-        "status": "Normal",
-        "xAxis": 0.03,
-        "yAxis": 0.02,
-        "zAxis": 0.97
-      },
-      "floatMpu": {
-        "height": 135,
-        "gForce": 1.01,
-        "status": "Normal",
-        "xAxis": 0.04,
-        "yAxis": 0.03,
-        "zAxis": 0.98
-      },
-      "waterLevel": {
-        "height": 135,
-        "jsnHeight": 138,
-        "deltaRate": "+18.4",
-        "status": "Normal"
-      },
-      "rain": {
-        "detected": true,
-        "rate": 12.5,
-        "unit": "mm/jam",
-        "status": "Hujan"
-      },
-      "deviceInfo": {
-        "deviceId": "ESP32-NODE-01",
-        "rssi": -75
-      }
+  "node_01": {
+    "deviceInfo": {
+      "deviceId": "ESP32-NODE-01",
+      "rssi": -75
     },
-    "node_02": {
-      "data_01": {
-        "masterAlert": {
-          "status": "AMAN",
-          "timestamp": "07 Nov 2026, 10:00 WIB"
-        },
-        "mpu6050": {
-          "gForce": 1.00,
-          "warningThreshold": 1.5,
-          "status": "Normal",
-          "xAxis": 0.01,
-          "yAxis": 0.01,
-          "zAxis": 1.00
-        },
-        "floatMpu": {
-          "height": 45,
-          "gForce": 1.00,
-          "status": "Normal",
-          "xAxis": 0.01,
-          "yAxis": 0.01,
-          "zAxis": 1.00
-        },
-        "waterLevel": {
-          "height": 45,
-          "jsnHeight": 47,
-          "deltaRate": "+0.1",
-          "status": "Normal"
-        },
-        "rain": {
-          "detected": false,
-          "rate": 0.0,
-          "unit": "mm/jam",
-          "status": "Cerah"
-        },
-        "deviceInfo": {
-          "deviceId": "ESP32-NODE-02",
-          "rssi": -65
-        }
-      },
-      "data_02": {
-        "masterAlert": {
-          "status": "AMAN",
-          "timestamp": "07 Nov 2026, 12:20 WIB"
-        },
-        "mpu6050": {
-          "gForce": 1.01,
-          "warningThreshold": 1.5,
-          "status": "Normal",
-          "xAxis": 0.02,
-          "yAxis": 0.01,
-          "zAxis": 0.99
-        },
-        "floatMpu": {
-          "height": 46,
-          "gForce": 1.01,
-          "status": "Normal",
-          "xAxis": 0.02,
-          "yAxis": 0.01,
-          "zAxis": 0.99
-        },
-        "waterLevel": {
-          "height": 46,
-          "jsnHeight": 48,
-          "deltaRate": "+0.2",
-          "status": "Normal"
-        },
-        "rain": {
-          "detected": false,
-          "rate": 0.0,
-          "unit": "mm/jam",
-          "status": "Cerah"
-        },
-        "deviceInfo": {
-          "deviceId": "ESP32-NODE-02",
-          "rssi": -63
-        }
-      },
-      "data_03": {
-        "masterAlert": {
-          "status": "AMAN",
-          "timestamp": "07 Nov 2026, 14:00 WIB"
-        },
-        "mpu6050": {
-          "gForce": 0.99,
-          "warningThreshold": 1.5,
-          "status": "Normal",
-          "xAxis": 0.01,
-          "yAxis": 0.02,
-          "zAxis": 1.01
-        },
-        "floatMpu": {
-          "height": 47,
-          "gForce": 0.99,
-          "status": "Normal",
-          "xAxis": 0.01,
-          "yAxis": 0.02,
-          "zAxis": 1.01
-        },
-        "waterLevel": {
-          "height": 47,
-          "jsnHeight": 49,
-          "deltaRate": "+0.3",
-          "status": "Normal"
-        },
-        "rain": {
-          "detected": false,
-          "rate": 0.0,
-          "unit": "mm/jam",
-          "status": "Cerah"
-        },
-        "deviceInfo": {
-          "deviceId": "ESP32-NODE-02",
-          "rssi": -62
-        }
-      }
+    "floatMpu": {
+      "available": true,
+      "gForceDeviation": 0.01,
+      "status": "Normal",
+      "xAxis": 0.04,
+      "yAxis": 0.03,
+      "zAxis": 0.98
+    },
+    "masterAlert": {
+      "status": "BAHAYA",
+      "timestamp": "2026-11-16T18:32:00+0700",
+      "uptimeMs": 12000
+    },
+    "sw420": {
+      "digitalState": 1,
+      "status": "Getaran Terdeteksi",
+      "vibrationDetected": true
+    },
+    "rain": {
+      "detected": true,
+      "rawAdc": 1200,
+      "status": "Hujan"
+    },
+    "waterLevel": {
+      "deltaRateCmPerMin": 0,
+      "jsnDistance": 138,
+      "valid": true,
+      "status": "Normal"
     }
   }
 }

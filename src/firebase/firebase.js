@@ -14,8 +14,11 @@ const firebaseConfig = {
     measurementId: import.meta.env.VITE_FIREBASE_MEASUREMENT_ID
 };
 
-// Inisialisasi Firebase
-const app = initializeApp(firebaseConfig);
+// Firebase is optional for local builds that use the bundled data.json.
+export const hasFirebaseConfig = Boolean(
+    firebaseConfig.apiKey && firebaseConfig.databaseURL && firebaseConfig.appId
+);
 
-// RTDB menjadi sumber data dashboard pada path sensors/{nodeId}.
-export const rtdb = getDatabase(app);
+export const rtdb = hasFirebaseConfig
+    ? getDatabase(initializeApp(firebaseConfig))
+    : null;
