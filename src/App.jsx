@@ -12,7 +12,7 @@ import './App.css';
 const RAIN_ADC_THRESHOLDS = { heavy: 1000, moderate: 2200, light: 3000 };
 
 export default function App() {
-  const { sensorData, activeNodeId, connectionState, lastSyncedAt } = useSensorData();
+  const { sensorData, activeNodeId, connectionState, lastSyncedAt, sampleCount } = useSensorData();
   const { masterAlert = {}, mpu6050, sw420 = {}, floatMpu = {}, waterLevel = {}, rain = {}, deviceInfo = {} } = sensorData ?? {};
   const vibrationSensor = mpu6050 ?? {
     ...sw420,
@@ -29,7 +29,7 @@ export default function App() {
   const rainUnit = rain.rawAdc !== undefined ? 'ADC' : rain.unit ?? 'mm/jam';
 
   return <main className="dashboard-shell"><section className="dashboard" aria-label="Dashboard mitigasi bencana">
-    <DashboardHeader deviceInfo={deviceInfo} activeNodeId={activeNodeId} connectionState={connectionState} lastSyncedAt={lastSyncedAt} />
+    <DashboardHeader deviceInfo={deviceInfo} activeNodeId={activeNodeId} connectionState={connectionState} lastSyncedAt={lastSyncedAt} sampleCount={sampleCount} />
     {sensorData ? <><div className="dashboard-grid">
       <MasterAlertCard {...masterAlert} />
       <EarthquakePanelCard {...vibrationSensor} />

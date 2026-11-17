@@ -43,6 +43,10 @@ Jika JSON diunggah persis seperti `data.json`, biarkan `VITE_FIREBASE_RTDB_PATH`
 
 Dashboard memilih node bernomor paling baru (`node_02` di atas `node_01`). Ia juga mendukung data bertingkat seperti `node_01/data_01`, struktur `/sensors/node_01`, dan path langsung ke satu node, misalnya `VITE_FIREBASE_RTDB_PATH=sensors/node_01`.
 
+### Perataan data RTDB
+
+Setiap pembaruan RTDB yang berbeda disimpan pada buffer berjalan berisi paling banyak 10 sampel per node. Nilai numerik (misalnya jarak air, ADC hujan, sumbu MPU, dan RSSI) yang ditampilkan adalah rata-rata seluruh sampel dalam buffer tersebut. Nilai nonnumerik seperti status, waktu, dan boolean selalu diambil dari sampel paling baru agar peringatan tidak tertunda. Saat node berganti, buffer dikosongkan supaya pembacaan antarperangkat tidak tercampur. Header menampilkan jumlah sampel aktif (`Rata-rata n/10 sampel`).
+
 ## Pemeriksaan produksi
 
 ```powershell

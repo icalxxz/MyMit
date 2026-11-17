@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { get, onValue, ref } from 'firebase/database';
 import sensorJson from '../../data.json';
 import { hasFirebaseConfig, rtdb, sensorPath } from '../firebase/firebase';
@@ -43,15 +43,48 @@ function selectSensorRecord(value) {
   return newestNode(value?.sensors);
 }
 
+const SAMPLE_LIMIT = 10;
+
+// Serialisasi stabil mencegah snapshot RTDB yang sama dihitung dua kali saat
+// koneksi tersambung ulang.
+function stableSerialize(value) {
+  if (value === null || typeof value !== 'object') return JSON.stringify(value);
+  if (Array.isArray(value)) return `[${value.map(stableSerialize).join(',')}]`;
+  return `{${Object.keys(value).sort().map(key => `${JSON.stringify(key)}:${stableSerialize(value[key])}`).join(',')}}`;
+}
+
+function averageSamples(samples) {
+  const latest = samples.at(-1);
+
+  const averageValue = (latestValue, values) => {
+    if (typeof latestValue === 'number' && Number.isFinite(latestValue)) {
+      const numericValues = values.filter(value => typeof value === 'number' && Number.isFinite(value));
+      return numericValues.reduce((sum, value) => sum + value, 0) / numericValues.length;
+    }
+    if (!latestValue || typeof latestValue !== 'object' || Array.isArray(latestValue)) return latestValue;
+
+    return Object.fromEntries(Object.keys(latestValue).map(key => [
+      key,
+      averageValue(latestValue[key], values.map(value => value?.[key])),
+    ]));
+  };
+
+  return averageValue(latest, samples);
+}
+
 /** Mengikuti semua sensors di RTDB, lalu menampilkan node bernomor terbaru. */
 export function useSensorData() {
-  const localNode = newestNode(sensorJson);
+  const localNode = useMemo(() => newestNode(sensorJson), []);
   // Tampilkan data.json lebih dahulu agar dashboard tetap berguna saat RTDB
   // belum tersambung. Snapshot Firebase akan menggantikan data ini saat ada.
   const [sensorData, setSensorData] = useState(localNode?.data ?? null);
   const [activeNodeId, setActiveNodeId] = useState(localNode?.id ?? null);
   const [connectionState, setConnectionState] = useState(hasFirebaseConfig ? 'connecting' : 'local');
   const [lastSyncedAt, setLastSyncedAt] = useState(null);
+  const [sampleCount, setSampleCount] = useState(0);
+  const samplesRef = useRef([]);
+  const sampleSourceRef = useRef(null);
+  const lastSampleKeyRef = useRef(null);
 
   useEffect(() => {
     if (!hasFirebaseConfig || !rtdb) return undefined;
@@ -61,7 +94,7 @@ export function useSensorData() {
     let syncRequest = 0;
     let unsubscribeRootFallback;
 
-    const useLocalFallback = () => {
+    const applyLocalFallback = () => {
       if (localNode) {
         setSensorData(localNode.data);
         setActiveNodeId(localNode.id);
@@ -73,9 +106,28 @@ export function useSensorData() {
       setConnectionState('empty');
     };
 
+    const addSample = selected => {
+      // data_01, data_02, dan seterusnya berasal dari node yang sama. Saat
+      // node berganti, sampel perangkat sebelumnya tidak boleh tercampur.
+      const sourceId = selected.id.split('/')[0];
+      const sampleKey = `${selected.id}:${stableSerialize(selected.data)}`;
+      if (sampleSourceRef.current !== sourceId) {
+        sampleSourceRef.current = sourceId;
+        samplesRef.current = [];
+        lastSampleKeyRef.current = null;
+      }
+      if (lastSampleKeyRef.current === sampleKey) return averageSamples(samplesRef.current);
+
+      lastSampleKeyRef.current = sampleKey;
+      samplesRef.current = [...samplesRef.current, selected.data].slice(-SAMPLE_LIMIT);
+      setSampleCount(samplesRef.current.length);
+      return averageSamples(samplesRef.current);
+    };
+
     const applySelectedRecord = (selected, fromServer = false) => {
       if (!selected) return false;
-      setSensorData(selected.data);
+      // Data lokal hanya sebagai cadangan; buffer berisi pembaruan RTDB.
+      setSensorData(fromServer ? addSample(selected) : selected.data);
       setActiveNodeId(selected.id);
       if (fromServer && isConnected) {
         setLastSyncedAt(new Date());
@@ -91,9 +143,9 @@ export function useSensorData() {
       unsubscribeRootFallback = onValue(ref(rtdb), snapshot => {
         if (!active) return;
         const selected = selectSensorRecord(snapshot.val());
-        if (!applySelectedRecord(selected, isConnected)) useLocalFallback();
+        if (!applySelectedRecord(selected, isConnected)) applyLocalFallback();
       }, () => {
-        if (active) useLocalFallback();
+        if (active) applyLocalFallback();
       });
     };
 
@@ -102,7 +154,7 @@ export function useSensorData() {
       const selected = selectSensorRecord(snapshot.val());
       if (!selected) {
         subscribeRootFallback();
-        useLocalFallback();
+        applyLocalFallback();
         return;
       }
       applySelectedRecord(selected, fromServer);
@@ -136,7 +188,7 @@ export function useSensorData() {
       unsubscribeConnection();
       unsubscribeRootFallback?.();
     };
-  }, []);
+  }, [localNode]);
 
-  return { sensorData, activeNodeId, connectionState, lastSyncedAt };
+  return { sensorData, activeNodeId, connectionState, lastSyncedAt, sampleCount };
 }
