@@ -71,3 +71,48 @@
 @media (min-width:601px) and (max-width:920px) { .dashboard-grid > :first-child { grid-column:auto; } }
 @media (min-width:921px) { .safety-card { grid-column:auto; } }
 .safety-guidance { margin:22px 0; padding:16px; border-radius:15px; color:#536176; font-size:14px; font-weight:750; box-shadow:inset 4px 4px 8px var(--shadow),inset -4px -4px 8px var(--highlight); }
+
+/* Layout refinements for narrow phones, embedded WebViews, and wide displays. */
+.dashboard, .dashboard-grid, .panel-card { min-width:0; }
+.dashboard-grid > * { min-width:0; }
+.card-heading { min-width:0; }
+.card-heading > .status-badge { max-width:48%; white-space:normal; text-align:center; line-height:1.25; }
+.rain-reading strong { min-width:0; overflow-wrap:anywhere; }
+.combined-readings { grid-template-columns:repeat(auto-fit,minmax(min(100%,150px),1fr)); }
+.history-item { min-width:0; }
+
+@media (min-width: 1200px) {
+  .dashboard-shell { padding-right:clamp(32px,4vw,72px); padding-left:clamp(32px,4vw,72px); }
+  .dashboard { max-width:1440px; }
+  .dashboard-grid { grid-template-columns:repeat(3,minmax(0,1fr)); gap:28px; }
+  .combined-water-card, .safety-card, .history-card { grid-column:1 / -1; }
+  .safety-states { grid-template-columns:repeat(3,minmax(0,1fr)); }
+}
+
+@media (min-width: 601px) and (max-width: 919px) {
+  .dashboard-shell { padding:28px 20px; padding-top:max(28px,env(safe-area-inset-top)); padding-bottom:max(28px,env(safe-area-inset-bottom)); }
+  .dashboard-grid { grid-template-columns:repeat(2,minmax(0,1fr)); gap:20px; }
+  .combined-water-card, .safety-card, .history-card { grid-column:1 / -1; }
+  .history-item { grid-template-columns:minmax(0,1fr) minmax(0,2fr) auto; }
+}
+
+@media (max-width: 600px) {
+  .dashboard-shell { padding-top:max(18px,env(safe-area-inset-top)); padding-right:max(14px,env(safe-area-inset-right)); padding-bottom:max(22px,env(safe-area-inset-bottom)); padding-left:max(14px,env(safe-area-inset-left)); }
+  .dashboard-grid { grid-template-columns:minmax(0,1fr); gap:16px; }
+  .dashboard-grid > *, .combined-water-card, .safety-card, .history-card { grid-column:1 / -1; }
+  .app-header { align-items:stretch; gap:16px; margin-bottom:22px; }
+  .app-title { max-width:none; font-size:clamp(24px,7vw,32px); overflow-wrap:anywhere; }
+  .header-meta { display:grid; grid-template-columns:minmax(0,1fr); gap:10px; }
+  .live-chip { min-width:0; flex-wrap:wrap; }
+  .live-chip small { margin-left:0; }
+  .device-chip { min-width:0; overflow-wrap:anywhere; }
+  .panel-card { padding:clamp(16px,4.5vw,22px); border-radius:19px; }
+  .card-heading { align-items:flex-start; flex-wrap:wrap; }
+  .card-heading > .status-badge { max-width:100%; margin-left:48px; }
+  .card-title-row { flex:1 1 180px; }
+  .history-item { grid-template-columns:minmax(0,1fr) auto; }
+  .history-summary { grid-column:1 / -1; }
+  .history-item > .status-badge { grid-column:2; grid-row:1; }
+  .safety-states { grid-template-columns:minmax(0,1fr); }
+  .danger-toast { right:max(12px,env(safe-area-inset-right)); bottom:max(12px,env(safe-area-inset-bottom)); width:auto; left:max(12px,env(safe-area-inset-left)); }
+}
