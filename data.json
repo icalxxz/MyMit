@@ -2,36 +2,37 @@
   "node_01": {
     "deviceInfo": {
       "deviceId": "ESP32-NODE-01",
-      "rssi": -75
+      "rssi": -36,
+      "uptimeMs": 441908
     },
     "floatMpu": {
       "available": true,
-      "gForceDeviation": 0.01,
+      "gForceDeviation": 0.014061,
       "status": "Normal",
-      "xAxis": 0.04,
-      "yAxis": 0.03,
-      "zAxis": 0.98
+      "xAxis": -0.02002,
+      "yAxis": -0.016602,
+      "zAxis": 0.985596
     },
     "masterAlert": {
-      "status": "BAHAYA",
-      "timestamp": "2026-11-16T18:32:00+0700",
-      "uptimeMs": 12000
-    },
-    "sw420": {
-      "digitalState": 1,
-      "status": "Getaran Terdeteksi",
-      "vibrationDetected": true
+      "status": "AMAN",
+      "timestamp": "2026-11-16T19:48:18+0700",
+      "uptimeMs": 441909
     },
     "rain": {
-      "detected": true,
-      "rawAdc": 1200,
-      "status": "Hujan"
+      "detected": false,
+      "rawAdc": 1409,
+      "status": "Tidak Hujan"
+    },
+    "sw420": {
+      "digitalState": 0,
+      "status": "Normal",
+      "vibrationDetected": false
     },
     "waterLevel": {
       "deltaRateCmPerMin": 0,
-      "jsnDistance": 138,
-      "valid": true,
-      "status": "Normal"
+      "jsnDistance": 41.79455,
+      "status": "Normal",
+      "valid": true
     }
   }
 }

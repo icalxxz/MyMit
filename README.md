@@ -12,15 +12,36 @@ Prasyarat: Node.js 20 atau lebih baru dan npm.
    Copy-Item .env.example .env
    ```
 
-2. Isi variabel `VITE_FIREBASE_*` di `.env` dengan konfigurasi Firebase Anda.
-3. Instal dependensi dan jalankan aplikasi:
+2. Isi variabel `VITE_FIREBASE_*` di `.env` dengan konfigurasi aplikasi Web dari **Firebase Console > Project settings > Your apps**. Gunakan URL dari **Realtime Database**, misalnya `https://NAMA-PROYEK-default-rtdb.asia-southeast1.firebasedatabase.app`, untuk `VITE_FIREBASE_DATABASE_URL`.
+3. Kosongkan `VITE_FIREBASE_RTDB_PATH` bila isi `data.json` diunggah langsung ke root RTDB. Isi variabel ini bila data berada dalam subpath, misalnya `sensors` untuk `/sensors/node_01` atau `monitoring/sensors` untuk `/monitoring/sensors/node_01`.
+4. Restart `npm run dev` setiap kali `.env` diubah; Vite hanya membaca environment saat mulai berjalan.
+5. Instal dependensi dan jalankan aplikasi:
 
    ```powershell
    npm ci
    npm run dev
    ```
 
-Jika konfigurasi Firebase tidak tersedia, dashboard membaca `data.json` lokal. Jika variabel Firebase tersedia, aplikasi memakai Realtime Database pada path `sensors`.
+Jika konfigurasi Firebase belum lengkap, dashboard membaca `data.json` lokal. Jika RTDB terhubung, data RTDB otomatis menggantikan data lokal dan diperbarui secara real-time.
+
+### Struktur data RTDB
+
+Jika JSON diunggah persis seperti `data.json`, biarkan `VITE_FIREBASE_RTDB_PATH` kosong dan unggah di root RTDB. Struktur yang dibaca adalah:
+
+```json
+{
+  "node_01": {
+    "deviceInfo": { "deviceId": "ESP32-NODE-01", "rssi": -36 },
+    "masterAlert": { "status": "AMAN", "timestamp": "2026-11-16T19:48:18+0700" },
+    "sw420": { "vibrationDetected": false, "status": "Normal" },
+    "waterLevel": { "jsnDistance": 41.79, "deltaRateCmPerMin": 0, "valid": true },
+    "floatMpu": { "available": true, "gForceDeviation": 0.01, "status": "Normal" },
+    "rain": { "detected": false, "rawAdc": 1409, "status": "Tidak Hujan" }
+  }
+}
+```
+
+Dashboard memilih node bernomor paling baru (`node_02` di atas `node_01`). Ia juga mendukung data bertingkat seperti `node_01/data_01`, struktur `/sensors/node_01`, dan path langsung ke satu node, misalnya `VITE_FIREBASE_RTDB_PATH=sensors/node_01`.
 
 ## Pemeriksaan produksi
 

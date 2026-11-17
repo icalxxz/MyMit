@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { get, onValue, ref } from 'firebase/database';
 import sensorJson from '../../data.json';
-import { hasFirebaseConfig, rtdb } from '../firebase/firebase';
+import { hasFirebaseConfig, rtdb, sensorPath } from '../firebase/firebase';
 
 function nodeNumber(key) {
   const match = String(key).match(/^(?:node[_-]?)?(\d+)$/i);
@@ -25,36 +25,87 @@ function newestNode(nodes) {
     : { id: nodeId, data: nodeData };
 }
 
+function isSensorRecord(value) {
+  if (!value || typeof value !== 'object') return false;
+  return ['deviceInfo', 'masterAlert', 'waterLevel', 'rain', 'sw420', 'floatMpu', 'mpu6050']
+    .some((key) => Object.hasOwn(value, key));
+}
+
+function selectSensorRecord(value) {
+  // Mendukung path yang menunjuk langsung ke data sebuah node, misalnya
+  // /sensors/node_01, selain struktur koleksi seperti isi data.json.
+  if (isSensorRecord(value)) return { id: sensorPath, data: value };
+  const directNode = newestNode(value);
+  if (directNode) return directNode;
+
+  // Saat JSON diimpor ke root RTDB, data dapat berada di /node_01.
+  // Bila memakai struktur /sensors/node_01, root RTDB berisi properti sensors.
+  return newestNode(value?.sensors);
+}
+
 /** Mengikuti semua sensors di RTDB, lalu menampilkan node bernomor terbaru. */
 export function useSensorData() {
   const localNode = newestNode(sensorJson);
-  const [sensorData, setSensorData] = useState(hasFirebaseConfig ? null : localNode?.data ?? null);
-  const [activeNodeId, setActiveNodeId] = useState(hasFirebaseConfig ? null : localNode?.id ?? null);
+  // Tampilkan data.json lebih dahulu agar dashboard tetap berguna saat RTDB
+  // belum tersambung. Snapshot Firebase akan menggantikan data ini saat ada.
+  const [sensorData, setSensorData] = useState(localNode?.data ?? null);
+  const [activeNodeId, setActiveNodeId] = useState(localNode?.id ?? null);
   const [connectionState, setConnectionState] = useState(hasFirebaseConfig ? 'connecting' : 'local');
   const [lastSyncedAt, setLastSyncedAt] = useState(null);
 
   useEffect(() => {
     if (!hasFirebaseConfig || !rtdb) return undefined;
-    const sensorsRef = ref(rtdb, 'sensors');
+    const sensorsRef = sensorPath ? ref(rtdb, sensorPath) : ref(rtdb);
     let active = true;
     let isConnected = false;
     let syncRequest = 0;
+    let unsubscribeRootFallback;
 
-    const applySnapshot = (snapshot, fromServer = false) => {
-      if (!active) return;
-      const selected = newestNode(snapshot.val());
-      if (!selected) {
-        setSensorData(null);
-        setActiveNodeId(null);
-        setConnectionState('empty');
+    const useLocalFallback = () => {
+      if (localNode) {
+        setSensorData(localNode.data);
+        setActiveNodeId(localNode.id);
+        setConnectionState('fallback');
         return;
       }
+      setSensorData(null);
+      setActiveNodeId(null);
+      setConnectionState('empty');
+    };
+
+    const applySelectedRecord = (selected, fromServer = false) => {
+      if (!selected) return false;
       setSensorData(selected.data);
       setActiveNodeId(selected.id);
       if (fromServer && isConnected) {
         setLastSyncedAt(new Date());
         setConnectionState('live');
       }
+      return true;
+    };
+
+    const subscribeRootFallback = () => {
+      if (unsubscribeRootFallback || sensorPath === '') return;
+      // Fallback ini menangani impor data.json persis di root RTDB:
+      // { "node_01": { ... } }, tanpa perlu memindahkannya ke /sensors.
+      unsubscribeRootFallback = onValue(ref(rtdb), snapshot => {
+        if (!active) return;
+        const selected = selectSensorRecord(snapshot.val());
+        if (!applySelectedRecord(selected, isConnected)) useLocalFallback();
+      }, () => {
+        if (active) useLocalFallback();
+      });
+    };
+
+    const applySnapshot = (snapshot, fromServer = false) => {
+      if (!active) return;
+      const selected = selectSensorRecord(snapshot.val());
+      if (!selected) {
+        subscribeRootFallback();
+        useLocalFallback();
+        return;
+      }
+      applySelectedRecord(selected, fromServer);
     };
 
     const unsubscribeData = onValue(sensorsRef, snapshot => applySnapshot(snapshot, isConnected), () => {
@@ -83,6 +134,7 @@ export function useSensorData() {
       syncRequest += 1;
       unsubscribeData();
       unsubscribeConnection();
+      unsubscribeRootFallback?.();
     };
   }, []);
 
